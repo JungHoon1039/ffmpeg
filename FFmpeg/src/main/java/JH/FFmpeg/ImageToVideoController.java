@@ -33,7 +33,7 @@ public class ImageToVideoController {
     for (int i = 0; i < imageUrls.size(); i++) {
       ffmpegCommandBuilder.append("[").append(i).append(":v]"); // index 번째 이미지 필터 설정
       ffmpegCommandBuilder.append("loop=60"); // loop/framerate 초 만큼 각 이미지가 재생된다
-      ffmpegCommandBuilder.append(":size=1"); // 반복할 프레임 수 설정 - 1프레임만 반복
+      ffmpegCommandBuilder.append(":size=1"); // 출력 프레임 크기 설정 - 설정한 사이즈 그대로 출력
       ffmpegCommandBuilder.append(":start=0"); // 반복 시작 시점 설정 - 0초부터 시작
       ffmpegCommandBuilder.append(",scale=1024:1024"); // 이미지 크기 설정 - 반드시 짝수로 설정해야함
       ffmpegCommandBuilder.append(",setsar=1"); // 픽셀 샘플링 화면 비율 설정 - 1:1로 설정
@@ -52,6 +52,7 @@ public class ImageToVideoController {
         .append(videoOutputPath); // 저장 경로 설정
 
     String ffmpegCommand = ffmpegCommandBuilder.toString(); // FFmpeg 명령어 완성
+    System.out.println(ffmpegCommand);
 
     executeCommand(ffmpegCommand); // 명령어를 시스템 커맨드로 실행
   }
@@ -73,6 +74,13 @@ public class ImageToVideoController {
     // 명령어 실행 결과를 한 줄씩 읽어와서 콘솔에 출력
     while ((line = reader.readLine()) != null) {
       System.out.println(line);
+    }
+
+    // 에러 스트림을 읽어서 로그에 추가 정보 기록
+    BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+    String errorLine;
+    while ((errorLine = errorReader.readLine()) != null) {
+      System.out.println(errorLine);
     }
 
     // 프로세스의 종료를 대기하고 종료 코드 출력
